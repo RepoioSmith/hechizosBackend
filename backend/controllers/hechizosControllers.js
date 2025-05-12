@@ -1,58 +1,71 @@
-const asyncHandler = require('express-async-handler')
-const Hechizo = require("../models/hechizosModel")
+const asyncHandler = require('express-async-handler');
+const Hechizo = require("../models/hechizosModel");
 
+// Obtener todos los hechizos
 const getHechizos = asyncHandler(async (req, res) => {
-    const hechizos = await Hechizo.find()
-    res.status(200).json({ hechizos })
-})
+    const hechizos = await Hechizo.find();
+    res.status(200).json({ hechizos });
+});
 
+// Crear un nuevo hechizo
 const createHechizos = asyncHandler(async (req, res) => {
-    if (!req.body.nombre||!req.body.nivel || !req.body.rango || !req.body.descripcion) {
-        res.status(400)
-        throw new Error("Informacion incompleta")
+    const { nombre, content } = req.body;
+
+    if (!nombre || !content || !Array.isArray(content)) {
+        res.status(400);
+        throw new Error("Información incompleta o formato incorrecto");
     }
 
-    const hechizo = await Hechizo.create({
-        nombre: req.body.nombre,
-        nivel: req.body.nivel,
-        rango: req.body.rango,
-        descripcion: req.body.descripcion
-    })
+    const hechizoExistente = await Hechizo.findOne({ nombre });
+    if (hechizoExistente) {
+        res.status(400);
+        throw new Error("El hechizo ya existe");
+    }
 
-    res.status(201).json({ hechizo })
-})
+    const hechizo = await Hechizo.create({ nombre, content });
 
+    res.status(201).json(hechizo);
+});
+
+// Actualizar un hechizo existente
 const updateHechizos = asyncHandler(async (req, res) => {
-
-    const hechizo = await Hechizo.findById(req.params.id)
+    const hechizo = await Hechizo.findById(req.params.id);
     if (!hechizo) {
-        res.status(404)
-        throw new Error('Tarea no encontrada')
+        res.status(404);
+        throw new Error('Hechizo no encontrado');
     }
 
-    const hechizosUpdated = await Hechizo.findByIdAndUpdate(req.params.id, req.body, {
-        new: true
-    })
+    const { nombre, content } = req.body;
 
-    res.status(200).json(hechizosUpdated)
-})
+    if (!nombre || !content || !Array.isArray(content)) {
+        res.status(400);
+        throw new Error("Información incompleta o formato incorrecto");
+    }
 
+    hechizo.nombre = nombre;
+    hechizo.content = content;
+
+    const hechizoActualizado = await hechizo.save();
+
+    res.status(200).json(hechizoActualizado);
+});
+
+// Eliminar un hechizo
 const deleteHechizos = asyncHandler(async (req, res) => {
-
-    const hechizo = await Hechizo.findById(req.params.id)
+    const hechizo = await Hechizo.findById(req.params.id);
     if (!hechizo) {
-        res.status(404)
-        throw new Error('Tarea no encontrada')
+        res.status(404);
+        throw new Error('Hechizo no encontrado');
     }
 
-    await hechizo.deleteOne()
+    await hechizo.deleteOne();
 
-    res.status(200).json({ "id": req.params.id })
-})
+    res.status(200).json({ mensaje: "Hechizo eliminado", id: req.params.id });
+});
 
 module.exports = {
     getHechizos,
     createHechizos,
     updateHechizos,
     deleteHechizos
-}
+};

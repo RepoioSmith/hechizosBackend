@@ -16,6 +16,8 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 
 app.use('/api/hechizos', require("./routes/hechizosRoutes"))
+app.use('/api/clases', require("./routes/clasesRoutes"))
+app.use('/api/characters', require("./routes/characterRoutes"))
 
 app.use(errorHandler)
 

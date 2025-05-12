@@ -1,25 +1,17 @@
-const mongoose = require("mongoose")
+const mongoose = require("mongoose");
 
 const hechizoSchema = mongoose.Schema({
     nombre: {
         type: String,
-        required: [true, "Por favor teclea el nombre"]
+        required: [true, "Por favor teclea el nombre"],
+        unique: true
     },
-    nivel: {
-        type: String,
-        required: [true, "Por favor teclea el nivel"]
-    },
-    rango:{
-        type: String,
-        required: [true, "Por favor teclea el rango"]
-    },
-    descripcion:{
-        type: String,
-        required: [true, "Por favor teclea la descripcion"]
-    },
-
-},{
+    content: {
+        type: [String], // Lista de strings como en tu JSON de ejemplo
+        required: [true, "Por favor incluye el contenido del hechizo"]
+    }
+}, {
     timestamps: true
-})
+});
 
-module.exports = mongoose.model("Hechizo", hechizoSchema)
+module.exports = mongoose.model("Hechizo", hechizoSchema);
